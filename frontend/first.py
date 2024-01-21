@@ -137,8 +137,8 @@ def submit_form():
 #         'show': True
 #     }
     
-    source_folder = "C:\\Users\\minat\\OneDrive\\Desktop\\backend" #"C:\\Users\\vyshak\\Desktop\\Git_Backup\\SayMyName"
-    destination_folder = "C:\\Users\\minat\\OneDrive\\Desktop\\F\\static\\audio" #"C:\\Users\\vyshak\\Desktop\\Git_Backup\\SayMyName\\HTML_V09\\static\\audio"
+    source_folder = "..\\backend" #"C:\\Users\\vyshak\\Desktop\\Git_Backup\\SayMyName"
+    destination_folder = "..\\F\\static\\audio" #"C:\\Users\\vyshak\\Desktop\\Git_Backup\\SayMyName\\HTML_V09\\static\\audio"
    # Construct absolute paths for the source and destination
     source_audio_path = os.path.join(source_folder, f"{first_name}  {student_id}.wav")
     destination_audio_path = os.path.join(destination_folder, f"{first_name}  {student_id}.wav")
