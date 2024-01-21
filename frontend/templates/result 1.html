@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Say My Name</title>
+</head>
+<body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-12 rounded-lg shadow-xl max-w-4xl mx-auto">
+            <h2 class="text-5xl font-bold text-gray-800 mb-10">Student Details</h2>
+            <form action="/submit" method="POST">
+                <table class="w-full mb-8 border border-gray-300 text-left text-lg">
+                    <tr class="bg-gray-200">
+                        <th class="px-6 py-3 text-xl font-semibold text-gray-700">StudentID:</th>
+                        <td class="px-6 py-3">
+                        <input type="hidden" name="student_id" value="{{ data.data.student_id }}">
+                        {{ data.data.student_id }}
+                        </td>
+                        <!-- <td class="px-6 py-3">{{data.data.student_id}}</td> -->
+                    </tr>
+                    <tr class="bg-gray-200">
+                        <th class="px-6 py-3 text-xl font-semibold text-gray-700">Preferred Name:</th>
+                        <td class="px-6 py-3">
+                            <input type="hidden" name="first_name" value="{{ data.data.first_name }}">
+                            {{ data.data.first_name }}
+                        </td>
+                        <!-- <td class="px-6 py-3">{{data.data.first_name}}</td> -->
+                    </tr>
+                </table>
+
+                <div class="mb-6">
+                    <p class="text-xl font-medium text-gray-800">Phonetics for the Preferred Name:</p>
+                    <p class="text-md text-gray-600">Select any one option:</p>
+                    <div class="mt-4">
+                        {% set displayed_values = [] %}
+
+                        {% for item in data.data.first_name_p_eng %}
+                        {% if item is not none and item and item not in displayed_values %}
+                        {% set _ = displayed_values.append(item) %}
+                        <label for="option_eng_{{ loop.index }}" class="inline-flex items-center">
+                            <input type="radio" id="option_eng_{{ loop.index }}" name="firstnameph" value="{{ item }}" class="text-indigo-600 border-gray-400 focus:ring-indigo-500">
+                            <span class="ml-3 text-gray-800">{{ item }}</span>
+                        </label><br />
+                        {% endif %}
+                        {% endfor %}
+
+                        {% for item in data.data.first_name_p %}
+                        {% if item is not none and item and item not in displayed_values %}
+                        {% set _ = displayed_values.append(item) %}
+                        <label for="option_{{ loop.index }}" class="inline-flex items-center">
+                            <input type="radio" id="option_{{ loop.index }}" name="firstnameph" value="{{ item }}" class="text-indigo-600 border-gray-400 focus:ring-indigo-500">
+                            <span class="ml-3 text-gray-800">{{ item }}</span>
+                        </label><br />
+                        {% endif %}
+                        {% endfor %}
+
+                        {% for result in data.results %}
+                        {% set name_selection_cleaned = result.name_selection[0:-1] %}
+                        {% if result.name_selection is not none and name_selection_cleaned and name_selection_cleaned not in displayed_values %}
+                        {% set _ = displayed_values.append(name_selection_cleaned) %}
+                        <label for="selected_option_{{ result.id }}" class="inline-flex items-center">
+                            <input type="radio" id="selected_option_{{ result.id }}" name="firstnameph" value="{{ result.name_selection }}">
+                            <span class="ml-3 text-gray-800">{{ name_selection_cleaned }}</span>
+                        </label><br />
+                        {% endif %}
+                        {% endfor %}
+
+                        <!--
+                        <label for="custom_phonetic" class="inline-flex items-center"></label>
+                        <input type="radio" id="custom_phonetic" name="firstnameph_radio" class="text-indigo-600 border-gray-400 focus:ring-indigo-500">
+                        <span class="ml-3 text-gray-800">Custom:</span>
+                        <input type="text" id="custom_phonetic" name="firstnameph_radio" placeholder="Enter your phonetic" class="ml-3 border-gray-400 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        -->
+                    </div>
+                </div>
+                <button type="submit" class="mt-6 w-full rounded-lg bg-indigo-700 px-6 py-4 text-xl font-bold text-white shadow-xl hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-700 focus:ring-opacity-50">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

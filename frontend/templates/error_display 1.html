@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Details</title>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-xl w-full mx-auto">
+            <h1 class="text-3xl font-extrabold text-red-600 mb-8">Error Details</h1>
+            {% for error in error_details %}
+            <div class="mb-6 p-6 bg-red-200 text-red-800 rounded-lg border border-red-400">
+                <h2 class="font-bold text-lg mb-2">Error:</h2>
+                <p class="mb-1">Type: <span class="font-medium">{{ error.type }}</span></p>
+                <p class="mb-1">Location: <span class="font-medium">{{ error.loc }}</span></p>
+                <p class="mb-1">Message: <span class="font-medium">{{ error.msg }}</span></p>
+                <p class="mb-1">Input: <span class="font-medium">{{ error.input }}</span></p>
+                <p class="mb-1">URL: <a href="{{ error.url }}" class="text-blue-600 hover:text-blue-800 visited:text-purple-600 underline transition duration-300 ease-in-out">{{ error.url }}</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

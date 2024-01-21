@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Final Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+        }
+ 
+        h1 {
+            color: #333;
+            font-size: 2em;
+        }
+ 
+        .success-message {
+            color: green;
+            font-weight: bold;
+        }
+ 
+        .phonetics {
+            color: #555;
+            color: #333;
+            margin-top: 20px;
+        }
+ 
+        button {
+            background-color: #008CBA;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50%; /* Circular button */
+        }
+    </style>
+    <script>
+        function playAudio() {
+            var audioPlayer = document.getElementById('audioPlayer');
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.currentTime = 0; // Optional: to restart the audio when pressing play again
+                audioPlayer.pause();
+            }
+        }
+    </script>
+</head>
+<body>
+    <form>
+        <table border="1">
+            <b>SUCCESS - YOUR PHONETICS ARE READY</b>
+            <br>
+            <br>
+            <br>
+            <b>Phonetics selected is : {{ data | replace("[","") | replace("]","") }}</b>
+            <br>
+            <br>
+            <b>Name : {{firstname}}</b>
+            <br>
+            <br>
+            <b>Student ID : {{student_id}}</b>
+            <br>
+            <br>
+        </table>
+        <audio id="audioPlayer">
+            <source src="{{ url_for('static', filename='audio/' + firstname + '  ' + student_id|string + '.wav') }}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+        <!-- Custom play button -->
+        <button type="button" onclick="playAudio()">Play</button>
+    </form>
+</body>
+</html>
