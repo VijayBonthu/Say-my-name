@@ -11,4 +11,4 @@ git push origin main
 All the above commands should let you commit changes and update the github.
 Make sure you update perodically, so that if you want to undo the pull request because your files are overwritten use the below command to undo it to previous version.
 git reset --hard HEAD^1
-
+Thank you
