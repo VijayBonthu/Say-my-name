@@ -1,6 +1,6 @@
 git clone https://github.com/VijayBonthu/say-my-name.git
 This should clone it to your laptop.
-install reqired modules and packages for both front end and backend using pip install requirements.txt.
+install reqired modules and packages for both front end and backend using pip install -r requirements.txt.
 Then work on the files accordingly.
 before pushing the changes make sure you pull the latest code using by doing the following commands.
 git remote add origin https://github.com/VijayBonthu/say-my-name.git
