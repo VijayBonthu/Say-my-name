@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, LargeBinary, BINARY
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 
@@ -9,11 +9,11 @@ class Student_data(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     student_id = Column(Integer, unique=True, nullable=False)
     first_name = Column(String, nullable=False)
-    pronoun = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    preferred_name = Column(String, nullable=False)
+    pronoun = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     status_active = Column(Boolean, server_default='TRUE', nullable=False)
-    lang_name = Column(String, nullable=False)
     course = Column(String, nullable=False)
     intake = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
@@ -26,10 +26,23 @@ class Namepronounciation(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     student_id = Column(Integer, ForeignKey(Student_data.student_id), nullable=False)
     name = Column(String, nullable=False)
-    name_selection = Column(String, nullable=False)
-    audio_selection = Column(String, nullable=True)
-    votes = Column(Integer, nullable=False, server_default= text('0'))
+    phonetics_selection = Column(String, nullable=False)
+    audio_selection = Column(String)
+    # votes = Column(Integer, nullable=False, server_default= text('0'))
     show = Column(Boolean, server_default='False') 
      
+class Phonetics(Base):
+    __tablename__ = 'phonetics_table'
 
+    phonetics_id = Column(Integer, primary_key=True)
+    names = Column(String, nullable=False)
+    phonetics = Column(String, nullable=False)
 
+class Votes(Base):
+    __tablename__ = 'votes'
+
+    votes_id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    phonetic = Column(String, nullable=False, unique=True)
+    votes = Column(Integer, nullable=False, server_default= text('1'))
+    exist_in_phonetics_db = Column(Boolean, server_default='False') 
