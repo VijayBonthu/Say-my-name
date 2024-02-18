@@ -29,12 +29,12 @@ class Selection(BaseModel):
     
 class Admin_page(BaseModel):
     studentID: Optional[int] = None
-    # firstname: str = None,
-    # lastname: str = None,
-    # preferred_name: str = None,
-    # year: int = None,
-    # course: str = None,
-    # intake: str = None,
+    firstname: str = None,
+    lastname: str = None,
+    preferred_name: str = None,
+    year: int = None,
+    course: str = None,
+    intake: str = None,
     # offset: int = 0,
     # limit: int = 10,
     # class Config:

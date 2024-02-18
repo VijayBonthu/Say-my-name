@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 import os
 from Split_word import Splitword
 from sqlalchemy import exc
+from typing import Optional
 
 from fastapi.middleware.wsgi import WSGIMiddleware
 
@@ -151,8 +152,10 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
         getting_votes = db.query(models.Votes).filter(models.Votes.phonetic.in_(details.phonetics_selection)).all()
 
         current_vote = [{"id": x.votes_id,"name": x.name, "phonetic": x.phonetic, "votes":x.votes, "exist_in_phonetics_db": x.exist_in_phonetics_db} for x in getting_votes]
-
-        print(current_vote[0]["id"])
+        try:
+            print(current_vote[0]["id"])
+        except IndexError as e:
+            return {f"Data is not present in votes table please check data_in_votes_table files in set to false"}
         statement_dict = []
         voting_data_dict = []
         for i in range(len(details.name)):
@@ -254,33 +257,81 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
     #     db.commit()
     #     # db.refresh(new_data)
 
-@app.get("/getRecords/{details}")
-async def get_students(details, db: Session= Depends(get_db)):
-    print(details)
+@app.get("/getRecords/")
+async def get_students(studentID: Optional[int] = None,
+    firstname: str = None,
+    lastname: str = None,
+    preferred_name: str = None,
+    year: int = None,
+    course: str = None,
+    intake: str = None, 
+    offset: int = 0,
+    limit: int = 10,
+    db: Session= Depends(get_db)):
 
-    # query = db.query(models.Student_data)
+    query =(
+    db.query(models.Student_data.student_id, 
+             models.Student_data.first_name,
+             models.Student_data.last_name,
+             models.Student_data.preferred_name,
+             models.Namepronounciation.phonetics_selection,
+             models.Student_data.pronoun,
+             models.Student_data.course,
+             models.Student_data.intake,
+             models.Student_data.year,
+             models.Namepronounciation.show)
+             .join(
+                 models.Namepronounciation,
+                 models.Student_data.student_id == models.Namepronounciation.student_id
+                 )
+            )
 
-    # if details.studentID:
-    #     query = query.filter(models.Student_data.student_id == details.studentID)
-    # # if firstname:
-    # #     query = query.filter(StudentDetails.firstname == firstname)
-    # # if lastname:
-    # #     query = query.filter(StudentDetails.lastname == lastname)
-    # # if preferred_name:
-    # #     query = query.filter(StudentDetails.preferred_name == preferred_name)
-    # # if year:
-    # #     query = query.filter(StudentDetails.year == year)
-    # # if course:
-    # #     query = query.filter(StudentDetails.course == course)
-    # # if intake:
-    # #     query = query.filter(StudentDetails.intake == intake)
+    results = query.all()
+    # print(results)
+    
+    # # print(results[0][0])
+    # return {"result": response_data }
 
-    # total_count = query.count()
+    # for student_data, pronounciation in results:
+    #     print(f"Student Data: {student_data}")
+    if studentID:
+        query.filter(models.Student_data.student_id == studentID)
+    # if firstname:
+    #     query = query.filter(StudentDetails.firstname == firstname)
+    # if lastname:
+    #     query = query.filter(StudentDetails.lastname == lastname)
+    # if preferred_name:
+    #     query = query.filter(StudentDetails.preferred_name == preferred_name)
+    # if year:
+    #     query = query.filter(StudentDetails.year == year)
+    # if course:
+    #     query = query.filter(StudentDetails.course == course)
+    # if intake:
+    #     query = query.filter(StudentDetails.intake == intake)
 
-    # students = query.offset(details.offset).limit(details.limit).all()
+    total_count = query.count()
 
-    # return {"total_count": total_count, "students": students}
-    return {"details": details}
+    results = query.offset(offset).limit(limit).all()
+
+    response_data = { "student_id": results[0][0],
+                     "first_name": results[0][1],
+                     "last_name": results[0][2],
+                     "preferred_name": results[0][3],
+                     "phonetics_selection": results[0][4],
+                     "pronoun":results[0][5],
+                     "course":results[0][6],
+                     "intake":results[0][7],
+                     "year":results[0][8],
+                     "show":results[0][9]
+                     }
+    
+    print(results)
+    print(total_count)
+    print(response_data)
+    return {"total_count": total_count,
+        "results": response_data}
+    # return {"total_count": total_count, "results": results}
+    # return {"details": details}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
