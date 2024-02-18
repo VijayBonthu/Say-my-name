@@ -80,8 +80,10 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
         db.commit()
         db.refresh(new_student_details)
     except exc.IntegrityError as e:
-        if "duplicate key value violates unique constraint" in str(e):
-            raise HTTPException(status_code=404, detail="Student ID already exists")   
+        return {"status": "failed",
+                "message":"Student ID already exists"}
+        # if "duplicate key value violates unique constraint" in str(e):
+        #     raise HTTPException(status_code=404, detail="Student ID already exists")   
         db.rollback()
         return {"status": "failed",
                 "message":"Student ID already exists"}
@@ -104,7 +106,7 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
     }
 
 
-    name_list = pro_data["preferred_name"]
+    name_list = pro_data["preferred_name"].split()
 
 
     results = db.query(models.Votes).filter(models.Votes.name.in_(name_list)).order_by(models.Votes.votes.desc()).limit(3).all()
@@ -210,7 +212,8 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
                 print(f"couldn't add the record because {e}")
                 db.rollback()
 
-    return {"Details": "Sucessfully updated"}
+    return {"status":'success',
+            "message":''}
 
 @app.get("/getRecords/")
 async def get_students(studentID: str = None,
