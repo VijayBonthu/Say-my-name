@@ -6,6 +6,7 @@ from different_languages import different_language
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 import os
 from Split_word import Splitword
 from sqlalchemy import exc
@@ -52,16 +53,20 @@ async def root(request):
 @app.post("/createpost", status_code=status.HTTP_201_CREATED )
 def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends(get_db)):
 
-    new_dict = details
+
     new_dict = details.dict()
+
+    new_dict["preferred_name"].lower(),
+    new_dict["first_name"] = details.first_name.lower()
+    new_dict["last_name"] = details.last_name.lower()
+    new_dict["course"] = details.course.upper()
     name = [details.first_name, details.last_name]
     full_name = " ".join(name)
-    new_dict["full_name"] = full_name
-    file_name = full_name+str(details.student_id)  
-    pronoun = details.pronoun
-    preferred_name = details.preferred_name.lower()
+    new_dict["full_name"] = full_name.lower()
+    file_name = full_name+str(details.student_id)
+    preferred_name = new_dict["preferred_name"]
 
-
+    #creates Audio
     different_language(text=preferred_name,lang="en")
     with open(f"{preferred_name}.wav", "rb") as file: 
         audio_binary = file.read()
@@ -80,6 +85,7 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
         db.commit()
         db.refresh(new_student_details)
     except exc.IntegrityError as e:
+        db.rollback()
         return {"status": "failed",
                 "message":"Student ID already exists"}
         # if "duplicate key value violates unique constraint" in str(e):
@@ -106,7 +112,7 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
     }
 
 
-    name_list = pro_data["preferred_name"].split()
+    name_list = pro_data["preferred_name"].split(",")
 
 
     results = db.query(models.Votes).filter(models.Votes.name.in_(name_list)).order_by(models.Votes.votes.desc()).limit(3).all()
@@ -131,13 +137,17 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
 
 #Checking to see if the created record is new, if details.data_in_votes_table is true then data exists so votes in vote table will be updated 
     if details.data_in_votes_table is True:
+        print("details exists")
         getting_votes = db.query(models.Votes).filter(models.Votes.phonetic.in_(details.phonetics_selection)).all()
+        print(getting_votes)
 
         current_vote = [{"id": x.votes_id,"name": x.name, "phonetic": x.phonetic, "votes":x.votes, "exist_in_phonetics_db": x.exist_in_phonetics_db} for x in getting_votes]
+        print(current_vote)
         try:
             print(current_vote[0]["id"])
         except IndexError as e:
-            return {f"Data is not present in votes table please check data_in_votes_table files in set to false"}
+            return {"status":'failed',
+                    "message":"Data is not present in votes table please check data_in_votes_table files in set to false"}
         statement_dict = []
         voting_data_dict = []
         for i in range(len(details.name)):
@@ -197,12 +207,12 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
             db.add(new_data)
             db.commit()
 
-        for i in range(len(details.name)):
-            voting_data = {
-                        "name":details.name[i],
-                        "phonetic": details.phonetics_selection[i],
-                        "votes":1}
-            voting_data_dict.append(voting_data)
+        # for i in range(len(details.name)):
+        #     voting_data = {
+        #                 "name":details.name[i],
+        #                 "phonetic": details.phonetics_selection[i],
+        #                 "votes":1}
+        #     voting_data_dict.append(voting_data)
         for vote_dict in voting_data_dict:
             new_data = models.Votes(**vote_dict)
             try:
@@ -244,7 +254,6 @@ async def get_students(studentID: str = None,
                  )
             )
 
-    results = query.all()
 
     if studentID:
         query.filter(models.Student_data.student_id == studentID)
@@ -281,19 +290,75 @@ async def get_students(studentID: str = None,
                     "show":show
                     }
         final_response.append(response_data)
-        # print(response_data)
 
-    # print(results)
-    # print(total_count)
-    # print(response_data)
     return {"total_count": total_count,
         "results": final_response}
-    # return {"total_count": total_count, "results": results}
-    # return {"details": details}
+
 
 @app.put("/update", status_code=status.HTTP_201_CREATED)
 async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
-    get_details = db.query(models.Student_data).filter(models.Student_data.student_id == details.student_id).first()
+
+    full_name = details.first_name.lower()+" "+ details.last_name.lower()
+    student_data = {
+        "student_id":details.student_id,
+        "first_name":details.first_name.lower(),
+        "last_name":details.last_name.lower(),
+        "full_name":full_name,
+        "preferred_name":details.preferred_name.lower(),
+        "course":details.course.upper(),
+        "intake":details.intake,
+        "year":details.year
+    }
+
+    pronounciation_data = {
+        "student_id":details.student_id,
+        "name":details.preferred_name.lower(),
+        "phonetics_selection":details.phonetics_selection,
+        "audio_selection":"this record is edited so no audio is created",
+        "show":True
+
+    }
+
+    getting_votes = db.query(models.Votes).filter(and_(models.Votes.phonetic == details.phonetics_selection, models.Votes.name == details.preferred_name)).first()
+    if getting_votes == None:
+        voting_data = {
+                        "name":details.preferred_name.lower(),
+                        "phonetic": details.phonetics_selection,
+                        "votes":1}
+        new_data = models.Votes(**voting_data)
+        try:
+                db.add(new_data)
+                db.commit()
+        except Exception as e:
+                print(f"couldn't add the record to voting table because {e}")
+                db.rollback()
+    else:
+        voting_data = {
+                        "votes_id": getting_votes.votes_id,
+                        "name":details.preferred_name,
+                        "phonetic": details.phonetics_selection,
+                        "votes":getting_votes.votes+1}
+        try:
+            db.query(models.Votes).filter(models.Votes.votes_id == getting_votes.votes_id).update(voting_data, synchronize_session=False)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            return {"status": "failed",
+                    "message": f"something went wrong when executing probable error {e}"}
+
+    
+
+    try:
+        db.query(models.Student_data).filter(models.Student_data.student_id == details.student_id).update(student_data, synchronize_session=False)
+        db.commit()
+        db.query(models.Namepronounciation).filter(models.Namepronounciation.student_id == details.student_id).update(pronounciation_data, synchronize_session=False)
+        db.commit()
+        db.query(models.Votes).filter(models.Votes.phonetic == pronounciation_data["phonetics_selection"])
+    except Exception as e:
+        print(e)
+        db.rollback()
+        return {"message": e,
+                "status": "failed"}
     
     
 
