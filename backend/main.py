@@ -81,8 +81,10 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
         db.refresh(new_student_details)
     except exc.IntegrityError as e:
         if "duplicate key value violates unique constraint" in str(e):
-            raise HTTPException(status_code=404, detail="Student ID already exists")
+            raise HTTPException(status_code=404, detail="Student ID already exists")   
         db.rollback()
+        return {"status": "failed",
+                "message":"Student ID already exists"}
 
     #logic to get the phonetics from the DB
     phonetics_data = db.query(models.Phonetics).filter(models.Phonetics.names == new_student_details.preferred_name.lower()).all()
@@ -115,7 +117,9 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
 
 
     return {"data": pro_data,
-            "results": results}
+            "results": results,
+            "status":'success',
+            "message":''}
 
 
 #creating selection record
@@ -283,6 +287,12 @@ async def get_students(studentID: str = None,
         "results": final_response}
     # return {"total_count": total_count, "results": results}
     # return {"details": details}
+
+@app.put("/update", status_code=status.HTTP_201_CREATED)
+async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
+    get_details = db.query(models.Student_data).filter(models.Student_data.student_id == details.student_id).first()
+    
+    
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
