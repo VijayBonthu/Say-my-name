@@ -43,6 +43,6 @@ class Votes(Base):
 
     votes_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    phonetic = Column(String, nullable=False, unique=True)
+    phonetic = Column(String, nullable=False)
     votes = Column(Integer, nullable=False, server_default= text('1'))
     exist_in_phonetics_db = Column(Boolean, server_default='False') 
