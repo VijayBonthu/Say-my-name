@@ -11,7 +11,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-df = pd.read_csv(".//final_phonetics_datav1.csv")
+df = pd.read_csv("..//final_phonetics_datav1.csv")
 
 try:
     df.to_sql('phonetics_table', engine)
