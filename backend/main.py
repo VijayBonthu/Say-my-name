@@ -26,16 +26,10 @@ def get_db():
     finally:
         db.close()
 
-# def get_db_session2():
-#     another_db = SessionLocal()
-#     try:
-#         yield another_db
-#     finally:
-#         another_db.close()
 
 app = FastAPI()
 
-#CORS to connect to any ip
+#CORS to connect to any ip Need to add ip's and ports here
 origins = ["http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
     "http://localhost",
@@ -78,6 +72,7 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
     with open(f"{file_name}.wav", "wb") as file:
         file.write(audio_binary)
 
+    #adding student details to DB
     new_student_details = models.Student_data(**new_dict)
 
     try:
@@ -90,9 +85,8 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
         db.rollback()
 
     #logic to get the phonetics from the DB
-    # phonetics_data = db.query(models.Phonetics).filter(models.Phonetics.names == new_student_details.preferred_name.lower()).all()
     phonetics_data = db.query(models.Phonetics).filter(models.Phonetics.names == new_student_details.preferred_name.lower()).all()
-    # print(phonetics_data.phonetics)
+
 
     preferred_phonetics = [x.phonetics for x in phonetics_data]
 
@@ -107,26 +101,8 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
     "phonetics": preferred_phonetics
     }
 
-    # first_name_pro_eng, last_name_pro_eng =Splitword().Phonetics_eng_words(first_name=pro_data["first_name"], last_name=pro_data["last_name"])
-    # first_name_pro, f_name_num= Splitword().pronouncing_word(first_name=pro_data["first_name"] )
-    # split_first_name = Splitword().seperating_name(first_name=pro_data["first_name"])
-    # first_name_pro, last_name_pro, f_name_num, l_name_num = Splitword().pronouncing_word(first_name=pro_data["first_name"], last_name=pro_data["last_name"])
-    # split_first_name, split_last_name = Splitword().seperating_name(first_name=pro_data["first_name"], last_name=pro_data['last_name'])
 
-
-
-
-    # pro_data["first_name_p_eng"] = first_name_pro_eng
-    # pro_data["first_name_p"] = first_name_pro
-    # pro_data["first_namenum_p"] = f_name_num
-    # pro_data["last_name_p_eng"] = last_name_pro_eng
-    # pro_data["last_name_p"] = last_name_pro
-    # pro_data["last_namenum_p"] = l_name_num
-    # pro_data["split_first_name"] = split_first_name
-    # pro_data["split_last_name"] = split_last_name
-
-
-    name_list = pro_data["preferred_name"].split()
+    name_list = pro_data["preferred_name"]
 
 
     results = db.query(models.Votes).filter(models.Votes.name.in_(name_list)).order_by(models.Votes.votes.desc()).limit(3).all()
@@ -145,9 +121,9 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
 #creating selection record
 @app.post("/selection", status_code=status.HTTP_201_CREATED)
 def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
-    # print(details.student_id, details.name)
 
 
+#Checking to see if the created record is new, if details.data_in_votes_table is true then data exists so votes in vote table will be updated 
     if details.data_in_votes_table is True:
         getting_votes = db.query(models.Votes).filter(models.Votes.phonetic.in_(details.phonetics_selection)).all()
 
@@ -192,13 +168,8 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
                 print(e) 
                 db.rollback()
             
-
+# data not present in votes table a new record will be created with vote as 1
     if details.data_in_votes_table is False:
-        # getting_votes = db.query(models.Votes).filter(models.Votes.phonetic.in_(details.phonetics_selection)).all()
-
-        # current_vote = [{"id": x.votes_id,"name": x.name, "phonetic": x.phonetic, "votes":x.votes, "exist_in_phonetics_db": x.exist_in_phonetics_db} for x in getting_votes]
-
-        # print(current_vote[0]["id"])
         statement_dict = []
         voting_data_dict = []
         for i in range(len(details.name)):
@@ -235,27 +206,7 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
                 print(f"couldn't add the record because {e}")
                 db.rollback()
 
-
-    # else:
-    #     for i in range(len(details.name)):
-    #         data = {"student_id":details.student_id,
-    #                 "name":details.name[i],
-    #                 "phonetics_selection":details.phonetics_selection[i],
-    #                 "audio_selection":details.audio_selection[i],
-    #                 "show":details.show}
-    #         statement_dict.append(data)
-    #         voting_data = {"name":details.name[i],
-    #             "phonetics": details.phonetics_selection[i],
-    #             "votes": 1}
-    #         voting_data_dict.append(voting_data)
-
-    # for stat_dict in statement_dict:
-    #     new_data = models.Namepronounciation(**stat_dict)
-    #     new_votes_data = models.Votes(**voting_data)
-    #     db.add(new_data)
-    #     db.add(new_votes_data)
-    #     db.commit()
-    #     # db.refresh(new_data)
+    return {"Details": "Sucessfully updated"}
 
 @app.get("/getRecords/")
 async def get_students(studentID: str = None,
