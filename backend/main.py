@@ -258,11 +258,11 @@ def selection(details:p_model_type.Selection, db: Session= Depends(get_db)):
     #     # db.refresh(new_data)
 
 @app.get("/getRecords/")
-async def get_students(studentID: Optional[int] = None,
+async def get_students(studentID: str = None,
     firstname: str = None,
     lastname: str = None,
     preferred_name: str = None,
-    year: int = None,
+    year: str = None,
     course: str = None,
     intake: str = None, 
     offset: int = 0,
@@ -287,49 +287,49 @@ async def get_students(studentID: Optional[int] = None,
             )
 
     results = query.all()
-    # print(results)
-    
-    # # print(results[0][0])
-    # return {"result": response_data }
 
-    # for student_data, pronounciation in results:
-    #     print(f"Student Data: {student_data}")
     if studentID:
         query.filter(models.Student_data.student_id == studentID)
-    # if firstname:
-    #     query = query.filter(StudentDetails.firstname == firstname)
-    # if lastname:
-    #     query = query.filter(StudentDetails.lastname == lastname)
-    # if preferred_name:
-    #     query = query.filter(StudentDetails.preferred_name == preferred_name)
-    # if year:
-    #     query = query.filter(StudentDetails.year == year)
-    # if course:
-    #     query = query.filter(StudentDetails.course == course)
-    # if intake:
-    #     query = query.filter(StudentDetails.intake == intake)
+    if firstname:
+        query = query.filter(models.Student_data.first_name.ilike(f'%{firstname}%'))
+    if lastname:
+        query = query.filter(models.Student_data.last_name.ilike(f'%{lastname}%'))
+    if preferred_name:
+        query = query.filter(models.Student_data.preferred_name.ilike(f'%{preferred_name}%'))
+    if year:
+        query = query.filter(models.Student_data.year == year)
+    if course:
+        query = query.filter(models.Student_data.course == course)
+    if intake:
+        query = query.filter(models.Student_data.intake == intake)
 
     total_count = query.count()
 
-    results = query.offset(offset).limit(limit).all()
+    query = query.offset(offset).limit(limit)
+    results = query.all()
 
-    response_data = { "student_id": results[0][0],
-                     "first_name": results[0][1],
-                     "last_name": results[0][2],
-                     "preferred_name": results[0][3],
-                     "phonetics_selection": results[0][4],
-                     "pronoun":results[0][5],
-                     "course":results[0][6],
-                     "intake":results[0][7],
-                     "year":results[0][8],
-                     "show":results[0][9]
-                     }
-    
-    print(results)
-    print(total_count)
-    print(response_data)
+    final_response = []
+    for record in results:
+        student_id, first_name,last_name,preferred_name, phonetics_selection, pronoun, course, intake, year, show = record
+        response_data = { "student_id": student_id,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "preferred_name": preferred_name,
+                    "phonetics_selection": phonetics_selection,
+                    "pronoun":pronoun,
+                    "course":course,
+                    "intake":intake,
+                    "year":year,
+                    "show":show
+                    }
+        final_response.append(response_data)
+        # print(response_data)
+
+    # print(results)
+    # print(total_count)
+    # print(response_data)
     return {"total_count": total_count,
-        "results": response_data}
+        "results": final_response}
     # return {"total_count": total_count, "results": results}
     # return {"details": details}
 
