@@ -27,15 +27,15 @@ class Selection(BaseModel):
 #     phonetics_selected: list
 #     audio_selected: str
     
-class Admin_page(BaseModel):
-    studentID: Optional[int] = None
-    firstname: str = None,
-    lastname: str = None,
-    preferred_name: str = None,
-    year: int = None,
-    course: str = None,
-    intake: str = None,
-    # offset: int = 0,
-    # limit: int = 10,
-    # class Config:
-    #     orm_mode = True
+class Update(BaseModel):
+    student_id: int
+    first_name: str
+    pronoun: str
+    last_name:str
+    preferred_name: str
+    course: str
+    intake: Literal["Fall", "January", "May"]
+    year: int
+    phonetics_selection: str
+    
+
