@@ -4,6 +4,7 @@ import uvicorn
 import p_model_type
 from different_languages import different_language
 import models
+import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -385,5 +386,5 @@ def user_feedback(details:p_model_type.userfeedback, db: Session= Depends(get_db
     return {"status": "sucessful",
             "message": ""}
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", port=8081, log_level="info", reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
