@@ -359,6 +359,8 @@ async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
         db.rollback()
         return {"message": e,
                 "status": "failed"}
+    return {"status": "sucessful",
+            "message": "updated record sucessfully"}
     
     
 
