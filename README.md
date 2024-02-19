@@ -57,4 +57,9 @@ The application implements Cross-Origin Resource Sharing (CORS) to allow connect
 In conclusion, this technical documentation provides an overview of a FastAPI application designed for managing student records and phonetic pronunciations. By following the installation instructions and understanding the API endpoints, users can effectively utilize the application to perform various operations related to student management and feedback submission.
 
 ---
-
+## Run the Project
+1. Download Docker desktop.
+2. Once installed, login to docker.
+3. in the command prompt run **docker-compose up --build** from the root of the project.
+4. to stop the container **docker-compose down**.
+5. to start the containers again **docker-compose up** if there are no changes to your program files. if you have changes then you have to run **docker-compose up --build**.
