@@ -42,3 +42,6 @@ class Update(BaseModel):
 class userfeedback(BaseModel):
     student_id: int
     userfeedback: str
+
+class deleterecord(BaseModel):
+    student_id:int
