@@ -88,7 +88,7 @@ def tt_speech(details:p_model_type.Post, response:Response, db: Session= Depends
     except exc.IntegrityError as e:
         db.rollback()
         return {"status": "failed",
-                "message":"Student ID already exists"}
+                "message":"Student ID already exists, please contact admin to have your record deleted"}
         # if "duplicate key value violates unique constraint" in str(e):
         #     raise HTTPException(status_code=404, detail="Student ID already exists")   
         db.rollback()
