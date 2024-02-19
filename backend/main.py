@@ -365,6 +365,25 @@ async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
             "message": "updated record sucessfully"}
     
     
+@app.post("/userfeedback", status_code=status.HTTP_201_CREATED)
+def user_feedback(details:p_model_type.userfeedback, db: Session= Depends(get_db)):
+    data = {
+        "student_id":details.student_id,
+        "userfeedback":details.userfeedback
+    }
+    print(data)
+    try:
+        new_data = models.Userfeedback(**data)
+        print(new_data)
+        db.add(new_data)
+        db.commit()
+    except Exception as e:
+        print(e)
+        db.rollback()
+        return {"status": "failed",
+                "message": "incorrect details received or feedback for this user is already exist."}
+    return {"status": "sucessful",
+            "message": ""}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
