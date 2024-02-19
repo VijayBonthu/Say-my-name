@@ -46,3 +46,9 @@ class Votes(Base):
     phonetic = Column(String, nullable=False)
     votes = Column(Integer, nullable=False, server_default= text('1'))
     exist_in_phonetics_db = Column(Boolean, server_default='False') 
+
+class Userfeedback(Base):
+    __tablename__ = 'userfeedback'
+    id = Column(Integer, primary_key=True, nullable=False)
+    student_id = Column(Integer, ForeignKey(Student_data.student_id), nullable=False, unique=True)
+    userfeedback = Column(String, nullable=False)
