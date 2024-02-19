@@ -57,4 +57,20 @@ The application implements Cross-Origin Resource Sharing (CORS) to allow connect
 In conclusion, this technical documentation provides an overview of a FastAPI application designed for managing student records and phonetic pronunciations. By following the installation instructions and understanding the API endpoints, users can effectively utilize the application to perform various operations related to student management and feedback submission.
 
 ---
+## Run the Project
+1. Download Docker desktop.
+2. Once installed, login to docker.
+3. in the command prompt run **docker-compose up --build** from the root of the project.
+4. to stop the container **docker-compose down**.
+5. to start the containers again **docker-compose up** if there are no changes to your program files. if you have changes then you have to run **docker-compose up --build**.
+6. If you having issues accessing the database from other GUI's it is possible you have already an instance of postrges in your machine and it's not letting you access it.
+      Press **Win + R** to open the Run dialog.
+      Type **services.msc** and press Enter. This will open the Services window.
+      Scroll down to find the PostgreSQL service. It may be named something like **"postgresql-x64-<version>"**.
+      Right-click on the PostgreSQL service and select **"Stop"**.
+   
+## Change in file before running
+1. To allow your front end to connect, you need to add the port of your frontend application to backend **main.py** in **CORS section**.
+2. change your DB connection url ports and password in **docker-compose.yml** in **db** section and **Service** section
+3. make sure the same **DB url** is used in **backend database.py**
 
