@@ -386,5 +386,30 @@ def user_feedback(details:p_model_type.userfeedback, db: Session= Depends(get_db
     return {"status": "sucessful",
             "message": ""}
 
+@app.delete("/deleterecord", status_code=status.HTTP_201_CREATED)
+def delete_record(details:p_model_type.deleterecord, db: Session= Depends(get_db)):
+    data = {
+        "student_id": details.student_id
+    }
+    record_details = db.query(models.Student_data).filter(models.Student_data.student_id == details.student_id).first()
+    if record_details != None:
+        try:
+            db.query(models.Namepronounciation).filter(models.Namepronounciation.student_id == details.student_id).delete(synchronize_session=False)
+            db.commit()
+            db.query(models.Userfeedback).filter(models.Userfeedback.student_id == details.student_id).delete(synchronize_session=False)
+            db.commit()
+            db.query(models.Student_data).filter(models.Student_data.student_id == details.student_id).delete(synchronize_session=False)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            return {"status": "failed",
+                    "message": e}
+    else:
+        return{"status": "sucessful",
+               "message": f"Record with {details.student_id} doesn't exist in the system "}
+    return {"status": "sucessful",
+            "message": "Deleted record sucessfully"}
+
+
 # if __name__ == "__main__":
 #     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
