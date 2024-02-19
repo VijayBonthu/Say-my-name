@@ -39,3 +39,6 @@ class Update(BaseModel):
     phonetics_selection: str
     
 
+class userfeedback(BaseModel):
+    student_id: int
+    userfeedback: str
