@@ -68,4 +68,9 @@ In conclusion, this technical documentation provides an overview of a FastAPI ap
       Type **services.msc** and press Enter. This will open the Services window.
       Scroll down to find the PostgreSQL service. It may be named something like **"postgresql-x64-<version>"**.
       Right-click on the PostgreSQL service and select **"Stop"**.
+   
+## Change in file before running
+1. To allow your front end to connect, you need to add the port of your frontend application to backend **main.py** in **CORS section**.
+2. change your DB connection url ports and password in **docker-compose.yml** in **db** section and **Service** section
+3. make sure the same **DB url** is used in **backend database.py**
 
