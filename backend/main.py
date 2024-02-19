@@ -332,6 +332,8 @@ async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
         except Exception as e:
                 print(f"couldn't add the record to voting table because {e}")
                 db.rollback()
+                return {"status": "failed",
+                    "message": f"something went wrong when executing probable error {e}"}
     else:
         voting_data = {
                         "votes_id": getting_votes.votes_id,
