@@ -362,8 +362,8 @@ async def selection(details:p_model_type.Update, db: Session= Depends(get_db)):
         db.rollback()
         return {"message": e,
                 "status": "failed"}
-    return {"status": "sucessful",
-            "message": "updated record sucessfully"}
+    return {"status": "success",
+            "message": "updated record successfully"}
     
     
 @app.post("/userfeedback", status_code=status.HTTP_201_CREATED)
@@ -383,7 +383,7 @@ def user_feedback(details:p_model_type.userfeedback, db: Session= Depends(get_db
         db.rollback()
         return {"status": "failed",
                 "message": "incorrect details received or feedback for this user is already exist."}
-    return {"status": "sucessful",
+    return {"status": "success",
             "message": ""}
 
 @app.delete("/deleterecord", status_code=status.HTTP_201_CREATED)
@@ -405,10 +405,10 @@ def delete_record(details:p_model_type.deleterecord, db: Session= Depends(get_db
             return {"status": "failed",
                     "message": e}
     else:
-        return{"status": "sucessful",
+        return{"status": "success",
                "message": f"Record with {details.student_id} doesn't exist in the system "}
-    return {"status": "sucessful",
-            "message": "Deleted record sucessfully"}
+    return {"status": "success",
+            "message": "Deleted record successfully"}
 
 
 # if __name__ == "__main__":
