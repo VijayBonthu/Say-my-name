@@ -141,6 +141,37 @@
 			"response": []
 		},
 		{
+			"name": "userfeedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"student_id\":92900217,\r\n    \"userfeedback\":\"yes\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8081/userfeedback",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8081",
+					"path": [
+						"userfeedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "update a record",
 			"request": {
 				"method": "PUT",
@@ -172,13 +203,13 @@
 			"response": []
 		},
 		{
-			"name": "userfeedback",
+			"name": "Deleting a record",
 			"request": {
-				"method": "POST",
+				"method": "DELETE",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"student_id\":92900217,\r\n    \"userfeedback\":\"yes\"\r\n}",
+					"raw": "{\r\n    \"student_id\": 92900217\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -186,7 +217,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8081/userfeedback",
+					"raw": "http://127.0.0.1:8081/deleterecord",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -196,7 +227,7 @@
 					],
 					"port": "8081",
 					"path": [
-						"userfeedback"
+						"deleterecord"
 					]
 				}
 			},
