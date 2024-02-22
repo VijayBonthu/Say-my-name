@@ -9,13 +9,10 @@ from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 import os
-from Split_word import Splitword
 from sqlalchemy import exc
-from typing import Optional
 from fastapi.responses import StreamingResponse
 import io
 
-from fastapi.middleware.wsgi import WSGIMiddleware
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -436,8 +433,11 @@ def get_audio(details:p_model_type.getaudiophonetics, db: Session=Depends(get_db
         return StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav")
 
     except Exception as e:
-        print(f"Error reading audio file '{file_path}': {e}")
-        return None
+        return {
+            "status": "failed",
+            "message": f"unable to get audio at this moment: {e}"
+        }
+
 
 @app.get("/getaudio", status_code=status.HTTP_200_OK)
 def get_audio(details:p_model_type.getaudio, db: Session=Depends(get_db)):
@@ -445,27 +445,24 @@ def get_audio(details:p_model_type.getaudio, db: Session=Depends(get_db)):
         "preferred_name" :details.preferred_name
     }
 
-    print(data["preferred_name"])
-
     different_language(text=data["preferred_name"], lang="en")
     file_path = f'{data["preferred_name"]}.wav'
     try:
-        with open(file_path, "rb") as file:  # Open in binary mode 'rb'
-            audio_binary_data = file.read()  # Read binary data
-            # new_dict_audio = {"audio_binary_data": audio_binary_data}  # Store in dictionary
+        with open(file_path, "rb") as file:  
+            audio_binary_data = file.read()  
+           
 
         # Remove temporary WAV file
         if os.path.exists(file_path):
             os.remove(file_path)
 
-        return {"data": StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav"),
-                "status": "success",
-                "message": "audio fetched"}
+        return StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav")
+
 
     except Exception as e:
         return {
             "status": "failed",
-            "message": "unable to get audio at this moment"
+            "message": f"unable to get audio at this moment: {e}"
         }
 
 # if __name__ == "__main__":
