@@ -446,6 +446,7 @@ def get_audio(details:p_model_type.getaudio, db: Session=Depends(get_db)):
     }
 
     print(data["preferred_name"])
+
     different_language(text=data["preferred_name"], lang="en")
     file_path = f'{data["preferred_name"]}.wav'
     try:
@@ -457,11 +458,15 @@ def get_audio(details:p_model_type.getaudio, db: Session=Depends(get_db)):
         if os.path.exists(file_path):
             os.remove(file_path)
 
-        return StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav")
+        return {"data": StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav"),
+                "status": "success",
+                "message": "audio fetched"}
 
     except Exception as e:
-        print(f"Error reading audio file '{file_path}': {e}")
-        return None
+        return {
+            "status": "failed",
+            "message": "unable to get audio at this moment"
+        }
 
 # if __name__ == "__main__":
 #     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
