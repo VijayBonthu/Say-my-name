@@ -12,6 +12,8 @@ import os
 from Split_word import Splitword
 from sqlalchemy import exc
 from typing import Optional
+from fastapi.responses import StreamingResponse
+import io
 
 from fastapi.middleware.wsgi import WSGIMiddleware
 
@@ -256,8 +258,11 @@ async def get_students(studentID: str = None,
             )
 
 
+    print(query)
+
     if studentID:
-        query.filter(models.Student_data.student_id == studentID)
+        query = query.filter(models.Student_data.student_id == studentID)
+        print(query)
     if firstname:
         query = query.filter(models.Student_data.first_name.ilike(f'%{firstname}%'))
     if lastname:
@@ -410,6 +415,53 @@ def delete_record(details:p_model_type.deleterecord, db: Session= Depends(get_db
     return {"status": "success",
             "message": "Deleted record successfully"}
 
+@app.get("/getaudiophonetics", status_code=status.HTTP_200_OK)
+def get_audio(details:p_model_type.getaudiophonetics, db: Session=Depends(get_db)):
+    data = {
+        "phonetics_name" :details.phonetics_name.lower()
+    }
+
+    print(data["phonetics_name"])
+    different_language(text=data["phonetics_name"], lang="en")
+    file_path = f'{data["phonetics_name"]}.wav'
+    try:
+        with open(file_path, "rb") as file:  # Open in binary mode 'rb'
+            audio_binary_data = file.read()  # Read binary data
+            # new_dict_audio = {"audio_binary_data": audio_binary_data}  # Store in dictionary
+
+        # Remove temporary WAV file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        return StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav")
+
+    except Exception as e:
+        print(f"Error reading audio file '{file_path}': {e}")
+        return None
+
+@app.get("/getaudio", status_code=status.HTTP_200_OK)
+def get_audio(details:p_model_type.getaudio, db: Session=Depends(get_db)):
+    data = {
+        "preferred_name" :details.preferred_name
+    }
+
+    print(data["preferred_name"])
+    different_language(text=data["preferred_name"], lang="en")
+    file_path = f'{data["preferred_name"]}.wav'
+    try:
+        with open(file_path, "rb") as file:  # Open in binary mode 'rb'
+            audio_binary_data = file.read()  # Read binary data
+            # new_dict_audio = {"audio_binary_data": audio_binary_data}  # Store in dictionary
+
+        # Remove temporary WAV file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        return StreamingResponse(io.BytesIO(audio_binary_data), media_type="audio/wav")
+
+    except Exception as e:
+        print(f"Error reading audio file '{file_path}': {e}")
+        return None
 
 # if __name__ == "__main__":
 #     uvicorn.run("main:app", port=8081, log_level="info", reload=True)
