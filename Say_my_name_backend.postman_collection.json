@@ -232,6 +232,74 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "get audio of preferred name",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"preferred_name\":\"gujarat\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8081/getaudio",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8081",
+					"path": [
+						"getaudio"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get audio phonetics",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phonetics_name\":\"goo-jah-RAHT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8081/getaudiophonetics",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8081",
+					"path": [
+						"getaudiophonetics"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
